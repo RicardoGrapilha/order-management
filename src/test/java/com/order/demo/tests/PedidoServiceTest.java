@@ -4,33 +4,34 @@ package com.order.demo.tests;
 
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.order.demo.entity.Pedido;
 import com.order.demo.entity.Produto;
 import com.order.demo.repository.PedidoRepository;
 import com.order.demo.service.imp.PedidoService;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PedidoServiceTest {
+	@Autowired
+	private PedidoRepository pedidoRepository;
 
     @Test
     public void testProcessarPedido() {
         Produto produto = new Produto();
         produto.setId(1L);
         produto.setNome("Produto Teste");
-        produto.setPreco(BigDecimal.valueOf(100));
+        produto.setPreco(Double.valueOf(100));
 
         Pedido pedido = new Pedido();
-        pedido.setProduto(produto);
-        pedido.setQuantidade(2);
+     
 
         
-        PedidoRepository mockRepository = Mockito.mock(PedidoRepository.class);
+        PedidoRepository mockRepository = Mockito.mock(pedidoRepository);
         Mockito.when(mockRepository.save(Mockito.any(Pedido.class)))
                .thenAnswer(invocation -> invocation.getArgument(0)); // Simula o retorno do save()
 
@@ -38,7 +39,7 @@ public class PedidoServiceTest {
 
         Pedido pedidoProcessado = pedidoService.processarPedido(pedido);
 
-        assertEquals(BigDecimal.valueOf(200), pedidoProcessado.getValorTotal());
+        assertEquals(Double.valueOf(200), pedidoProcessado.getValorTotal());
         assertEquals("Processado", pedidoProcessado.getStatus());
     }
     @Test
@@ -62,12 +63,12 @@ public class PedidoServiceTest {
             Produto produto = new Produto();
             produto.setId((long) i);
             produto.setNome("Produto " + i);
-            produto.setPreco(BigDecimal.valueOf(10 + (i % 91))); // Preço entre 10 e 100
+            produto.setPreco(Double.valueOf(10 + (i % 91))); // Preço entre 10 e 100
 
             
             Pedido pedido = new Pedido();
-            pedido.setProduto(produto);
-            pedido.setQuantidade(1 + (i % 10)); // Quantidade entre 1 e 10
+           
+            
 
             pedidos.add(pedido);
         }
@@ -83,8 +84,8 @@ public class PedidoServiceTest {
             Pedido pedido = pedidos.get(i);
             Pedido pedidoProcessado = pedidosProcessados.get(i);
 
-            BigDecimal valorEsperado = pedido.getProduto().getPreco()
-                    .multiply(BigDecimal.valueOf(pedido.getQuantidade()));
+            Double valorEsperado = pedido.getProdutos().stream().mapToDouble(Produto::getPreco).sum();
+           
 
             assertEquals(valorEsperado, pedidoProcessado.getValorTotal(), "Erro no valor total do pedido");
             assertEquals("Processado", pedidoProcessado.getStatus(), "Erro no status do pedido");

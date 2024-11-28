@@ -1,18 +1,23 @@
 package com.order.demo.service.imp;
 
 
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.order.demo.entity.Pedido;
+import com.order.demo.entity.Produto;
 import com.order.demo.repository.PedidoRepository;
 import com.order.demo.service.IPedidoService;
 
-import java.math.BigDecimal;
+import jakarta.persistence.EntityManager;
+
 import java.util.List;
 
 @Service
 public class PedidoService implements IPedidoService {
+	@Autowired
+	private EntityManager entityManager;
     
     private final PedidoRepository pedidoRepository;
 
@@ -21,19 +26,28 @@ public class PedidoService implements IPedidoService {
         this.pedidoRepository = pedidoRepository;
     }
 
-    @Override
     public Pedido processarPedido(Pedido pedido) {
-        pedido.setValorTotal(
-            pedido.getProduto().getPreco().multiply(
-                BigDecimal.valueOf(pedido.getQuantidade())
-            )
-        );
+    	
+    	pedido.setValorTotal(
+		    pedido.getProdutos().stream()
+		          .mapToDouble(produto -> produto.getPreco() * produto.getQuantidade())
+		          .sum()
+		);
+    	// Preenche o campo "pedido" de cada produto (se necessário)
+        for (Produto produto : pedido.getProdutos()) {
+            produto.setPedido(pedido);  // Associa o pedido ao produto
+        }
+        
         pedido.setStatus("Processado");
         return pedidoRepository.save(pedido);
     }
 
-    @Override
     public List<Pedido> listarTodos() {
-        return pedidoRepository.findAll();
+    	 List<Pedido> pedidos = pedidoRepository.findAll();
+
+    	 pedidos.forEach(p -> Hibernate.initialize(p.getProdutos())); // Inicializa apenas quando necessário
+    	    
+
+    	    return pedidos;
     }
 }

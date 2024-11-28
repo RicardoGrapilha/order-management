@@ -3,12 +3,14 @@ package com.order.demo.entity;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigDecimal;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Produto {
@@ -25,9 +27,16 @@ public class Produto {
 
     @Getter
     @Setter
-    private BigDecimal preco;
+    private Double preco;
 
     @Getter
     @Setter
-    private Integer estoque;
+    private Integer quantidade;
+    
+    @Getter
+    @Setter
+    @ManyToOne
+    @JoinColumn(name = "pedido_id")
+    @JsonBackReference
+    private Pedido pedido;
 }

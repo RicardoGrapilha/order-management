@@ -16,12 +16,11 @@ public class ProdutoService implements IProdutoService {
     @Autowired
     private ProdutoRepository produtoRepository;
 
-    @Override
     public Produto salvarProduto(Produto produto) {
         return produtoRepository.save(produto);
     }
 
-    @Override
+
     public List<Produto> listarProdutos() {
         return produtoRepository.findAll();
     }
