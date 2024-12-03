@@ -1,19 +1,18 @@
 package com.order.demo.entity;
 
-import lombok.Getter;
-import lombok.Setter;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
-public class Produto {
+@Table(name = "pedido_produto")
+public class PedidoProduto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,19 +20,24 @@ public class Produto {
     @Setter
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "pedido_id", nullable = false)
     @Getter
     @Setter
-    private String nome;
+    private Pedido pedido;
+
+    @ManyToOne
+    @JoinColumn(name = "produto_id", nullable = false)
+    @Getter
+    @Setter
+    private Produto produto;
+
+    @Getter
+    @Setter
+    private Integer quantidade;
 
     @Getter
     @Setter
     private Double preco;
 
-    @Getter
-    @Setter
-    private Integer quantidade;
-    
-    @Getter
-    @Setter
-    private Integer estoque;
 }

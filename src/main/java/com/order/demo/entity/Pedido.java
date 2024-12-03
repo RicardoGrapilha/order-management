@@ -1,12 +1,12 @@
 package com.order.demo.entity;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,16 +24,20 @@ public class Pedido {
    
     @Getter
     @Setter
-    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY) 
-    @JsonManagedReference
-    private List<Produto> produtos;
-    
-    
-    @Getter
-    @Setter
     private Double valorTotal;
     
     @Getter
     @Setter
     private String status; // Pendente, Processado, etc.
+    
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Getter
+    @Setter
+    private List<PedidoProduto> pedidoProdutos = new ArrayList<>();
+    
+    @Getter
+    @Setter
+    @Column(nullable = false)
+    private LocalDateTime dataCriacao = LocalDateTime.now();
+
 }
